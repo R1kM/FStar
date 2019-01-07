@@ -405,6 +405,37 @@ rule token args = parse
  | "|" { BAR }
  | "}" { RBRACE }
  | "$" { DOLLAR }
+ (* New Unicode equivalents *)
+ | "∀" { FORALL }
+ | "∃" { EXISTS }
+ | "⊤" { NAME "True" }
+ | "⊥" { NAME "False" }
+ | "⟹" { IMPLIES }
+ | "⟺" { IFF }
+ | "→" { RARROW }
+ | "←" { LARROW }
+ | "⟵" { LONG_LEFT_ARROW }
+ | "↝" { SQUIGGLY_RARROW }
+ | "≔" { COLON_EQUALS }
+ | "∧" { CONJUNCTION }
+ | "∨" { DISJUNCTION }
+ | "¬" { TILDE "~" }
+ | "⸬" { COLON_COLON }
+ | "▹" { PIPE_RIGHT }
+ | "÷" { OPINFIX3 "÷" }
+ | "‖" { OPINFIX0a "||" }
+ | "×" { IDENT "op_Multiply" }
+ | "∗" { OPINFIX3 "*" }
+ | "⇒" { OPINFIX0c "=>" }
+ | "≥" { OPINFIX0c ">=" }
+ | "≤" { OPINFIX0c "<=" }
+ | "≠" { OPINFIX0c "<>" }
+ | "≪" { OPINFIX0c "<<" }
+ | "◃" { OPINFIX0c "<|" }
+ | "±" { OPPREFIX "±" }
+ | "∁" { OPPREFIX "∁" }
+ | "∂" { OPPREFIX "∂" }
+ | "√" { OPPREFIX "√" }
 
  // Operators.
  | op_prefix  symbolchar* { OPPREFIX (ulexeme lexbuf) }

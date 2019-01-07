@@ -160,6 +160,7 @@ let keywords =
     ALWAYS, "friend"     ,FRIEND;
     ALWAYS, "forall"     ,FORALL;
     ALWAYS, "fun"        ,FUN;
+    ALWAYS, "λ"          ,FUN;
     ALWAYS, "function"   ,FUNCTION;
     ALWAYS, "if"         ,IF;
     ALWAYS, "in"         ,IN;
@@ -199,21 +200,52 @@ let keywords =
     ALWAYS, "when"       ,WHEN;
     ALWAYS, "with"       ,WITH;
     ALWAYS, "_"          ,UNDERSCORE;
+    ALWAYS, "α"          ,TVAR "a";
+    ALWAYS, "β"          ,TVAR "b";
+    ALWAYS, "γ"          ,TVAR "c";
+    ALWAYS, "δ"          ,TVAR "d";
+    ALWAYS, "ε"          ,TVAR "e";
+    ALWAYS, "φ"          ,TVAR "f";
+    ALWAYS, "χ"          ,TVAR "g";
+    ALWAYS, "η"          ,TVAR "h";
+    ALWAYS, "ι"          ,TVAR "i";
+    ALWAYS, "κ"          ,TVAR "k";
+    ALWAYS, "μ"          ,TVAR "m";
+    ALWAYS, "ν"          ,TVAR "n";
+    ALWAYS, "π"          ,TVAR "p";
+    ALWAYS, "θ"          ,TVAR "q";
+    ALWAYS, "ρ"          ,TVAR "r";
+    ALWAYS, "σ"          ,TVAR "s";
+    ALWAYS, "τ"          ,TVAR "t";
+    ALWAYS, "ψ"          ,TVAR "u";
+    ALWAYS, "ω"          ,TVAR "w";
+    ALWAYS, "ξ"          ,TVAR "x";
+    ALWAYS, "ζ"          ,TVAR "z";
   ]
 let stringKeywords = List.map (fun (_, w, _) -> w) keywords
+
+let constructors =
+  [ ALWAYS, "ℕ"          ,IDENT "nat";
+    ALWAYS, "ℤ"          ,IDENT "int";
+    ALWAYS, "𝔹"          ,IDENT "bool";
+  ]
+let stringConstructors = List.map (fun (_, w, _) -> w) constructors
 
 (*------------------------------------------------------------------------
 !* Keywords
  *-----------------------------------------------------------------------*)
-
-let unreserve_words =
-    List.choose (fun (mode,keyword,_) -> if mode = FSHARP then Some keyword else None) keywords
 
 let kwd_table =
     let tab = Util.smap_create 1000 in
     List.iter (fun (mode,keyword,token) -> Util.smap_add tab keyword token) keywords;
     tab
 let kwd s = Util.smap_try_find kwd_table s
+
+let ctor_table =
+    let tab = Util.smap_create 1000 in
+    List.iter (fun (mode,constructor,token) -> Util.smap_add tab constructor token) constructors;
+    tab
+let ctor s = Util.smap_try_find ctor_table s
 
 type lexargs = {
   getSourceDirectory: (unit -> string);
@@ -227,19 +259,23 @@ let mkLexargs (srcdir,(filename:string),(contents:string)) = {
   contents = contents
 }
 
+let opt_or (o : option<'a>) (f : unit -> 'a) : 'a =
+  match o with
+  | Some v -> v
+  | None -> f ()
+
 let kwd_or_id args (r:Range.range) s =
-  match kwd s with
-    | Some v ->
-      v
-    | None ->
-      match s with
-        | "__SOURCE_DIRECTORY__" ->
-          STRING (args.getSourceDirectory())
-        | "__SOURCE_FILE__" ->
-          STRING (Range.file_of_range r)
-        | "__LINE__" ->
-          INT (Util.string_of_int <| Range.line_of_pos (Range.start_of_range r), false)
-        | _ ->
-          if Util.starts_with s Ident.reserved_prefix
-          then raise_error (Errors.Fatal_ReservedPrefix, (Ident.reserved_prefix  ^ " is a reserved prefix for an identifier")) r
-          else IDENT (intern_string(s))
+  opt_or (kwd s) (fun () ->
+  opt_or (ctor s) (fun () ->
+    match s with
+      | "__SOURCE_DIRECTORY__" ->
+        STRING (args.getSourceDirectory())
+      | "__SOURCE_FILE__" ->
+        STRING (Range.file_of_range r)
+      | "__LINE__" ->
+        INT (Util.string_of_int <| Range.line_of_pos (Range.start_of_range r), false)
+      | _ ->
+        if Util.starts_with s Ident.reserved_prefix
+        then raise_error (Errors.Fatal_ReservedPrefix, (Ident.reserved_prefix  ^ " is a reserved prefix for an identifier")) r
+        else IDENT (intern_string(s))
+  ))
