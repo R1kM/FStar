@@ -1200,7 +1200,7 @@ let settable = function
 let resettable s = settable s || s="z3seed" || s="z3cliopt" || s="using_facts_from"
 let all_specs = specs ()
 let all_specs_with_types = specs_with_types ()
-let settable_specs = all_specs |> List.filter (fun (_, x, _, _) -> settable x)
+let settable_specs = all_specs |> List.filter (fun (_, x, _, _) -> resettable x)
 let resettable_specs = all_specs |> List.filter (fun (_, x, _, _) -> resettable x)
 
 

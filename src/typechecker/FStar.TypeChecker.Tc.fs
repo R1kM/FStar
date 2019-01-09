@@ -1787,6 +1787,9 @@ let add_sigelt_to_env (env:Env.env) (se:sigelt) :Env.env =
   match se.sigel with
   | Sig_inductive_typ _ -> failwith "add_sigelt_to_env: Impossible, bare data constructor"
   | Sig_datacon _ -> failwith "add_sigelt_to_env: Impossible, bare data constructor"
+  | Sig_pragma (PushOptions _)
+  | Sig_pragma PopOptions
+  | Sig_pragma (SetOptions _)
   | Sig_pragma (ResetOptions _) -> z3_reset_options env
   | Sig_pragma _
   | Sig_new_effect_for_free _ -> env
