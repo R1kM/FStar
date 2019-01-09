@@ -2623,7 +2623,7 @@ let (settable_specs :
     (FStar_List.filter
        (fun uu____9320  ->
           match uu____9320 with
-          | (uu____9335,x,uu____9337,uu____9338) -> settable x))
+          | (uu____9335,x,uu____9337,uu____9338) -> resettable x))
   
 let (resettable_specs :
   (FStar_BaseTypes.char * Prims.string * unit FStar_Getopt.opt_variant *
