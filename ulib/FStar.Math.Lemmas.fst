@@ -387,10 +387,15 @@ let lemma_mod_sub_distr (a:int) (b:int) (n:pos) =
   lemma_mod_plus (a - (b % n)) (-(b / n)) n
 
 
+#push-options "--z3rlimit 20"
+
 val lemma_mod_sub_0: a:pos -> Lemma ((-1) % a = a - 1)
 let lemma_mod_sub_0 a = ()
+
 val lemma_mod_sub_1: a:pos -> b:pos{a < b} -> Lemma ((-a) % b = b - (a%b))
 let lemma_mod_sub_1 a b = ()
+
+#pop-options
 
 //NS: not sure why this requires 4 unfoldings
 //    it fails initially, and then succeeds on a retry with less fuel; strange
